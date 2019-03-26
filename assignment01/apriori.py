@@ -3,15 +3,14 @@ from itertools import combinations, chain
 
 # read file and returns list containing transactions
 def loadDatabase(inputfile):
-    f = open(inputfile, mode='rt')
+    f = open(inputfile, mode='r')
     data = []
     while True:
         line = f.readline()
         if not line:
             break
-        line = line[:-1]
         items = []
-        for i in line.split('\t'):
+        for i in line.strip('\n').split('\t'):
             items.append(int(i))
         data.append(set(items))
     f.close()
@@ -31,13 +30,11 @@ def scanDatabase(D, Ck, minSupport):
                     supportCnt[cand] += 1
     transNum = float(len(D))
     Lk = []                 # frequent itemsets of size k
-    supportData = {}        # support data
     for key, value in supportCnt.items():
         s = value / transNum * 100
         if s >= float(minSupport):
             Lk.append(key)
-        supportData[key] = s
-    return Lk, supportData                    
+    return Lk, supportCnt                    
 
 # generate candidate itemset of size 1 by 
 # scanning through database
@@ -57,8 +54,9 @@ def generateCandidate(Lk, k):
     lenLk = len(Lk)
     for i in range(lenLk):
         for j in range(i+1,lenLk):
-            L1 = Lk[i]; L2 = Lk[j]
-            if len(L1 & L2) == k-2:
+            L1 = (Lk[i]); L2 = (Lk[j])
+            #if len(L1 & L2) == k-2:
+            if list(L1)[:-1] == list(L2)[:-1]:
                 if not (L1 | L2) in retList:
                     retList.append(L1 | L2)
     return retList
@@ -115,7 +113,7 @@ if __name__ == "__main__":
         assocRules = generateRules(L, supportData)
         
         for (a, b), conf in assocRules:
-            sup = supportData[a | b]
+            sup = supportData[a | b] / len(database) * 100
             fout.write("{}\t{}\t".format(set(a), set(b)))
             fout.write("{0:.2f}\t".format(sup))
             fout.write("{0:.2f}\n".format(conf))
