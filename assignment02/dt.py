@@ -1,3 +1,6 @@
+# author: 2016024793 김유진
+# Data Science assignment #2: Decision Tree
+
 import math
 import sys
 from collections import Counter, defaultdict
@@ -52,22 +55,28 @@ def load_test_data(filename):
     f.close()
     return data
 
+# return entropy value using list of probabilities
 def entropy(probabilities):
     return sum(-p * math.log(p, 2) for p in probabilities.values() if p is not 0)
 
+# return a dictionary of probabilities by counting labels 
+#  for example, {'no':0.5, 'yes':0.5}
 def class_probabilities(labels):
     total_cnt = len(labels)
     return dict([(key, value / total_cnt) for key, value in Counter(labels).items()])
 
+# return information gain of labeled dataset
 def info_gain(labeled_data):
     labels = [label for _, label in labeled_data]
     probabilities = class_probabilities(labels)
     return entropy(probabilities)
 
+# returns information gain of subsets
 def partition_info_gain(subsets):
     total_cnt = sum(len(subset) for subset in subsets)
     return sum(info_gain(subset) * len(subset) / total_cnt for subset in subsets)
 
+# returns split information of subsets.
 def partition_split_info(subsets):
     total_cnt = sum(len(subset) for subset in subsets)
     return sum(-1 * len(s) / total_cnt * math.log(len(s)/total_cnt, 2) for s in subsets)
@@ -80,11 +89,13 @@ def partition_by(inputs, attribute):
         groups[key].append(i)
     return groups
 
+# return information gain when splited by given attribute
 def partition_info_gain_by(inputs, attribute):    
     partitions = partition_by(inputs, attribute)
     infoD = info_gain(inputs)
     return infoD - partition_info_gain(partitions.values())
 
+# return gain ratio when splited by given attribute
 def partition_gain_ratio_by(inputs, attribute):
     partitions = partition_by(inputs, attribute)
     gain = partition_info_gain_by(inputs, attribute)
@@ -128,6 +139,7 @@ def build_tree(inputs, split_candidates=None):
     # build tree recursively
     subtrees = {attr_value : build_tree(subset, new_candidates) 
                     for attr_value, subset in partitions.items()}
+    # for exception handling
     subtrees[None] = majority(num_class)
     return(best_attr, subtrees)
 
