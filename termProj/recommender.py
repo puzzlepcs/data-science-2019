@@ -35,7 +35,7 @@ if __name__=="__main__":
                 factorizer = pickle.load(f)
         except:
             print('\nmodel {} not found. Start training...'.format(pickle_filename))
-            factorizer = MatrixFactorization(A, k=150, learning_rate=0.01, reg_param=0.01, epochs=1000, verbose=True)
+            factorizer = MatrixFactorization(A, k=150, learning_rate=0.01, reg_param=0.01, epochs=800, verbose=True)
             factorizer.fit()
             with gzip.open(pickle_filename, 'wb') as f:
                 pickle.dump(factorizer, f)
