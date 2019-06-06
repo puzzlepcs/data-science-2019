@@ -47,6 +47,7 @@ def printResult(filename, result):
     '''
     Print the predictions on a file
     '''
+    filename = filename.split('/')[-1]
     outputfilename = filename + '_prediction.txt'
     f = open(outputfilename, "w")
     for user_id, item_id, rating in result:
